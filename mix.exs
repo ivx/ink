@@ -7,6 +7,8 @@ defmodule Ink.Mixfile do
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
+     description: description(),
+     package: package(),
      deps: deps()]
   end
 
@@ -16,6 +18,26 @@ defmodule Ink.Mixfile do
   def application do
     # Specify extra applications you'll use from Erlang/Elixir
     [extra_applications: [:logger]]
+  end
+
+  defp description do
+    """
+    A backend for the Elixir Logger that logs JSON and can filter sensitive data.
+    """
+  end
+
+  defp package do
+    [name: :ink,
+     files: ["lib",
+             "priv",
+             "mix.exs",
+             "README*",
+             "readme*",
+             "LICENSE*",
+             "license*"],
+     maintainers: ["Mario Mainz"],
+     licenses: ["MIT"],
+     links: %{"GitHub" => "https://github.com/ivx/ink"}]
   end
 
   # Dependencies can be Hex packages:
