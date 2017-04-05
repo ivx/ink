@@ -26,7 +26,8 @@ defmodule Ink do
 
   def log_message(message, level, timestamp, metadata, config) do
     if log_level?(level, config.level) do
-      base_map(message, timestamp)
+      message
+      |> base_map(timestamp)
       |> Map.merge(Enum.into(metadata, %{}))
       |> Poison.encode
       |> log_json(config)
