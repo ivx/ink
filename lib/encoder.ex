@@ -15,3 +15,15 @@ defimpl Poison.Encoder, for: Reference do
     Poison.Encoder.BitString.encode(inspect(ref), options)
   end
 end
+
+defimpl Poison.Encoder, for: Tuple do
+  def encode(tuple, options) do
+    Poison.Encoder.BitString.encode(inspect(tuple), options)
+  end
+end
+
+defimpl Poison.Encoder, for: Function do
+  def encode(function, options) do
+    Poison.Encoder.BitString.encode(inspect(function), options)
+  end
+end
