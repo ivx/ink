@@ -28,12 +28,21 @@ defmodule Ink do
     if log_level?(level, config.level) do
       base_map(message, timestamp)
       |> Map.merge(Enum.into(metadata, %{}))
-      |> Poison.encode!
-      |> IO.puts
+      |> Poison.encode
+      |> log_json(config)
     end
   end
 
-  defp base_map(message, timestamp) do
+  defp log_json({:ok, json}, config) do
+    json
+    |> filter_secret_strings(config.filtered_strings)
+    |> IO.puts
+  end
+  defp log_json(other, _) do
+    if Mix.env == :dev, do: IO.puts inspect(other)
+  end
+
+  defp base_map(message, timestamp) when is_binary(message) do
     %{message: message, timestamp: formatted_timestamp(timestamp)}
   end
 
@@ -43,8 +52,15 @@ defmodule Ink do
     |> NaiveDateTime.to_iso8601
   end
 
+  defp filter_secret_strings(message, secret_strings) do
+    Enum.reduce(secret_strings, message, fn secret, msg ->
+      String.replace(msg, secret, "[FILTERED]")
+    end)
+  end
+
   defp default_options do
-    %{level: :debug}
+    %{level: :debug, filtered_strings: []}
+    |> Map.merge(Enum.into(Application.get_env(:logger, Ink), %{}))
   end
 
   defp log_level?(msg_level, config_level) do

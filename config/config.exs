@@ -3,6 +3,8 @@
 use Mix.Config
 
 config :logger, backends: [Ink]
+config :logger, Ink, filtered_strings: ["SECRET"]
+
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this
 # file won't be loaded nor affect the parent project. For this reason,

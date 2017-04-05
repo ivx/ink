@@ -3,6 +3,10 @@ defmodule InkTest do
 
   import ExUnit.CaptureIO
 
+  defp default_config do
+    %{level: :info, filtered_strings: ["SECRET"]}
+  end
+
   setup do
     {:ok, %{timestamp: {{2017, 2, 1}, {4, 3, 2, 5123}}}}
   end
@@ -13,7 +17,7 @@ defmodule InkTest do
 
   test "it logs a message", %{timestamp: timestamp} do
     msg = capture_io(fn ->
-      Ink.log_message("test", :info, timestamp, [], %{level: :info})
+      Ink.log_message("test", :info, timestamp, [], default_config())
     end)
 
     assert Poison.decode!(msg) == %{
@@ -23,7 +27,7 @@ defmodule InkTest do
 
   test "it includes metadata", %{timestamp: timestamp} do
     msg = capture_io(fn ->
-      Ink.log_message("test", :info, timestamp, [moep: "hi"], %{level: :info})
+      Ink.log_message("test", :info, timestamp, [moep: "hi"], default_config())
     end)
 
     assert Poison.decode!(msg) == %{
@@ -34,9 +38,30 @@ defmodule InkTest do
 
   test "respects log level", %{timestamp: timestamp} do
     msg = capture_io(fn ->
-      Ink.log_message("test", :info, timestamp, [moep: "hi"], %{level: :warn})
+      Ink.log_message(
+        "test",
+        :info,
+        timestamp,
+        [moep: "hi"],
+        Map.put(default_config(), :level, :warn))
     end)
 
     assert msg == ""
+  end
+
+  test "it filters secret strings", %{timestamp: timestamp} do
+    msg = capture_io(fn ->
+      Ink.log_message(
+        "this is a SECRET string",
+        :info,
+        timestamp,
+        [moep: "hi"],
+        default_config())
+    end)
+
+    assert Poison.decode!(msg) == %{
+      "message" => "this is a [FILTERED] string",
+      "moep" => "hi",
+      "timestamp" => "2017-02-01T04:03:02.005"}
   end
 end
