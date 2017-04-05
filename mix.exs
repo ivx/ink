@@ -29,12 +29,8 @@ defmodule Ink.Mixfile do
   defp package do
     [name: :ink,
      files: ["lib",
-             "priv",
              "mix.exs",
-             "README*",
-             "readme*",
-             "LICENSE*",
-             "license*"],
+             "README*"],
      maintainers: ["Mario Mainz"],
      licenses: ["MIT"],
      links: %{"GitHub" => "https://github.com/ivx/ink"}]
