@@ -25,6 +25,16 @@ defmodule InkTest do
       "message" => "test"}
   end
 
+  test "it doesn't JSON encode the message", %{timestamp: timestamp} do
+    msg = capture_io(fn ->
+      Ink.log_message([1 | 2], :info, timestamp, [], default_config())
+    end)
+
+    assert Poison.decode!(msg) == %{
+      "timestamp" => "2017-02-01T04:03:02.005",
+      "message" => "[1 | 2]"}
+  end
+
   test "it includes metadata", %{timestamp: timestamp} do
     msg = capture_io(fn ->
       Ink.log_message("test", :info, timestamp, [moep: "hi"], default_config())

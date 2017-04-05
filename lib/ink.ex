@@ -45,6 +45,9 @@ defmodule Ink do
   defp base_map(message, timestamp) when is_binary(message) do
     %{message: message, timestamp: formatted_timestamp(timestamp)}
   end
+  defp base_map(message, timestamp) do
+    %{message: inspect(message), timestamp: formatted_timestamp(timestamp)}
+  end
 
   defp formatted_timestamp({date, {hours, minutes, seconds, microseconds}}) do
     {date, {hours, minutes, seconds}}
