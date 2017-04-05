@@ -3,8 +3,12 @@ defmodule Ink do
 
   @log_level_priorities %{debug: 0, info: 1, warn: 2, error: 3}
 
-  def init(Ink) do
+  def init(__MODULE__) do
     {:ok, default_options()}
+  end
+
+  def handle_call({:configure, options}, state) do
+    {:ok, :ok, Map.merge(state, Enum.into(options, %{}))}
   end
 
   def handle_event({_, gl, {Logger, _, _, _}}, state) when node(gl) != node() do
@@ -13,10 +17,6 @@ defmodule Ink do
 
   def handle_event(:flush, state) do
     {:ok, state}
-  end
-
-  def handle_event({:configure, options}, state) do
-    {:ok, Map.merge(state, Enum.into(options, %{}))}
   end
 
   def handle_event({level, _, {Logger, message, timestamp, metadata}}, state) do
