@@ -56,8 +56,10 @@ defmodule InkTest do
 
   test "it filters URI credentials" do
     Logger.configure_backend(
-      Ink, filtered_uri_credentials: ["amqp://guest:password@localhost:5672"])
-    Logger.info("the credentials from your URI are guest and password")
+      Ink, filtered_uri_credentials: ["amqp://guest:guest@rabbitmq:5672",
+                                      "redis://redis:6379/4",
+                                      nil])
+    Logger.info("the credentials from your URI are guest and guest")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     assert %{
