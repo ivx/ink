@@ -2,14 +2,11 @@ defmodule Ink do
   use GenEvent
 
   def init(__MODULE__) do
-    {:ok, default_options()}
+    {:ok, configure(Application.get_env(:logger, Ink, []), default_options())}
   end
 
   def handle_call({:configure, options}, state) do
-    config = state
-    |> Map.merge(Enum.into(options, %{}))
-    |> update_secret_strings
-    {:ok, :ok, config}
+    {:ok, :ok, configure(options, state)}
   end
 
   def handle_event({_, gl, {Logger, _, _, _}}, state) when node(gl) != node() do
@@ -25,7 +22,13 @@ defmodule Ink do
     {:ok, state}
   end
 
-  def log_message(message, level, timestamp, metadata, config) do
+  defp configure(options, state) do
+    state
+    |> Map.merge(Enum.into(options, %{}))
+    |> update_secret_strings
+  end
+
+  defp log_message(message, level, timestamp, metadata, config) do
     if Logger.compare_levels(level, config.level) != :lt do
       message
       |> base_map(timestamp)
@@ -80,6 +83,5 @@ defmodule Ink do
       secret_strings: [],
       io_device: :stdio
     }
-    |> Map.merge(Enum.into(Application.get_env(:logger, Ink, []), %{}))
   end
 end

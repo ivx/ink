@@ -39,6 +39,13 @@ defmodule InkTest do
     refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
   end
 
+  test "it filters preconfigured secret strings" do
+    Logger.info("this is moep")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert %{"message" => "this is [FILTERED]"} = Poison.decode!(msg)
+  end
+
   test "it filters secret strings" do
     Logger.configure_backend(Ink, filtered_strings: ["SECRET"])
     Logger.info("this is a SECRET string")
