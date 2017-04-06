@@ -2,8 +2,7 @@
 # and its dependencies with the aid of the Mix.Config module.
 use Mix.Config
 
-config :logger, backends: [Ink]
-config :logger, Ink, filtered_strings: ["SECRET"]
+config :logger, backends: []
 
 # This configuration is loaded before any dependency and is restricted
 # to this project. If another project depends on this project, this

@@ -1,77 +1,60 @@
 defmodule InkTest do
   use ExUnit.Case, async: false
 
-  import ExUnit.CaptureIO
-
-  defp default_config do
-    %{level: :info, filtered_strings: ["SECRET"]}
-  end
+  require Logger
 
   setup do
-    {:ok, %{timestamp: {{2017, 2, 1}, {4, 3, 2, 5123}}}}
+    {:ok, _} = Logger.add_backend(Ink)
+    Logger.configure_backend(Ink, io_device: self())
+    on_exit fn ->
+      Logger.flush
+      Logger.remove_backend(Ink)
+    end
   end
 
   test "it can be configured" do
-    Logger.configure_backend(Ink, [test: :moep])
+    Logger.configure_backend(Ink, test: :moep)
   end
 
-  test "it logs a message", %{timestamp: timestamp} do
-    msg = capture_io(fn ->
-      Ink.log_message("test", :info, timestamp, [], default_config())
-    end)
+  test "it logs a message" do
+    Logger.info("test")
 
-    assert Poison.decode!(msg) == %{
-      "timestamp" => "2017-02-01T04:03:02.005",
-      "message" => "test"}
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert %{"message" => "test", "timestamp" => timestamp} = Poison.decode!(msg)
+    assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
   end
 
-  test "it doesn't JSON encode the message", %{timestamp: timestamp} do
-    msg = capture_io(fn ->
-      Ink.log_message([1 | 2], :info, timestamp, [], default_config())
-    end)
+  test "it includes metadata" do
+    Logger.metadata(test: 1)
+    Logger.info("test")
 
-    assert Poison.decode!(msg) == %{
-      "timestamp" => "2017-02-01T04:03:02.005",
-      "message" => "[1 | 2]"}
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert %{"test" => 1} = Poison.decode!(msg)
   end
 
-  test "it includes metadata", %{timestamp: timestamp} do
-    msg = capture_io(fn ->
-      Ink.log_message("test", :info, timestamp, [moep: "hi"], default_config())
-    end)
+  test "respects log level" do
+    Logger.configure_backend(Ink, level: :warn)
+    Logger.info("test")
 
-    assert Poison.decode!(msg) == %{
-      "timestamp" => "2017-02-01T04:03:02.005",
-      "message" => "test",
-      "moep" => "hi"}
+    refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
   end
 
-  test "respects log level", %{timestamp: timestamp} do
-    msg = capture_io(fn ->
-      Ink.log_message(
-        "test",
-        :info,
-        timestamp,
-        [moep: "hi"],
-        Map.put(default_config(), :level, :warn))
-    end)
+  test "it filters secret strings" do
+    Logger.configure_backend(Ink, filtered_strings: ["SECRET"])
+    Logger.info("this is a SECRET string")
 
-    assert msg == ""
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert %{"message" => "this is a [FILTERED] string"} = Poison.decode!(msg)
   end
 
-  test "it filters secret strings", %{timestamp: timestamp} do
-    msg = capture_io(fn ->
-      Ink.log_message(
-        "this is a SECRET string",
-        :info,
-        timestamp,
-        [moep: "hi"],
-        default_config())
-    end)
+  test "it filters URI credentials" do
+    Logger.configure_backend(
+      Ink, filtered_uri_credentials: ["amqp://guest:password@localhost:5672"])
+    Logger.info("the credentials from your URI are guest and password")
 
-    assert Poison.decode!(msg) == %{
-      "message" => "this is a [FILTERED] string",
-      "moep" => "hi",
-      "timestamp" => "2017-02-01T04:03:02.005"}
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert %{
+      "message" => "the credentials from your URI are [FILTERED] and [FILTERED]"
+    } = Poison.decode!(msg)
   end
 end

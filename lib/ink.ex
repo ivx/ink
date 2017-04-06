@@ -1,14 +1,15 @@
 defmodule Ink do
   use GenEvent
 
-  @log_level_priorities %{debug: 0, info: 1, warn: 2, error: 3}
-
   def init(__MODULE__) do
     {:ok, default_options()}
   end
 
   def handle_call({:configure, options}, state) do
-    {:ok, :ok, Map.merge(state, Enum.into(options, %{}))}
+    config = state
+    |> Map.merge(Enum.into(options, %{}))
+    |> update_secret_strings
+    {:ok, :ok, config}
   end
 
   def handle_event({_, gl, {Logger, _, _, _}}, state) when node(gl) != node() do
@@ -25,7 +26,7 @@ defmodule Ink do
   end
 
   def log_message(message, level, timestamp, metadata, config) do
-    if log_level?(level, config.level) do
+    if Logger.compare_levels(level, config.level) != :lt do
       message
       |> base_map(timestamp)
       |> Map.merge(Enum.into(metadata, %{}))
@@ -36,12 +37,14 @@ defmodule Ink do
 
   defp log_json({:ok, json}, config) do
     json
-    |> filter_secret_strings(config.filtered_strings)
-    |> IO.puts
+    |> filter_secret_strings(config.secret_strings)
+    |> log_to_device(config.io_device)
   end
-  defp log_json(other, _) do
-    if Mix.env == :dev, do: IO.puts inspect(other)
+  defp log_json(other, config) do
+    if Mix.env == :dev, do: log_to_device(inspect(other), config.io_device)
   end
+
+  defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
   defp base_map(message, timestamp) when is_binary(message) do
     %{message: message, timestamp: formatted_timestamp(timestamp)}
@@ -56,6 +59,13 @@ defmodule Ink do
     |> NaiveDateTime.to_iso8601
   end
 
+  defp update_secret_strings(config) do
+    uri_credentials = Enum.flat_map(config.filtered_uri_credentials, fn uri ->
+      uri |> URI.parse |> Map.get(:userinfo) |> String.split(":")
+    end)
+    Map.put(config, :secret_strings, config.filtered_strings ++ uri_credentials)
+  end
+
   defp filter_secret_strings(message, secret_strings) do
     Enum.reduce(secret_strings, message, fn secret, msg ->
       String.replace(msg, secret, "[FILTERED]")
@@ -63,11 +73,13 @@ defmodule Ink do
   end
 
   defp default_options do
-    %{level: :debug, filtered_strings: []}
-    |> Map.merge(Enum.into(Application.get_env(:logger, Ink), %{}))
-  end
-
-  defp log_level?(msg_level, config_level) do
-    @log_level_priorities[msg_level] >= @log_level_priorities[config_level]
+    %{
+      level: :debug,
+      filtered_strings: [],
+      filtered_uri_credentials: [],
+      secret_strings: [],
+      io_device: :stdio
+    }
+    |> Map.merge(Enum.into(Application.get_env(:logger, Ink, []), %{}))
   end
 end
