@@ -47,7 +47,7 @@ defmodule InkTest do
   end
 
   test "it filters secret strings" do
-    Logger.configure_backend(Ink, filtered_strings: ["SECRET"])
+    Logger.configure_backend(Ink, filtered_strings: ["SECRET", "", nil])
     Logger.info("this is a SECRET string")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
@@ -58,6 +58,8 @@ defmodule InkTest do
     Logger.configure_backend(
       Ink, filtered_uri_credentials: ["amqp://guest:guest@rabbitmq:5672",
                                       "redis://redis:6379/4",
+                                      "",
+                                      "blarg",
                                       nil])
     Logger.info("the credentials from your URI are guest and guest")
 

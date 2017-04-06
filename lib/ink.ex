@@ -63,12 +63,18 @@ defmodule Ink do
   end
 
   defp update_secret_strings(config) do
-    uri_credentials = config.filtered_uri_credentials
+    secret_strings = config.filtered_strings
+    |> Kernel.++(uri_credentials(config.filtered_uri_credentials))
+    |> Enum.reject(fn s -> s == "" || is_nil(s) end)
+    Map.put(config, :secret_strings, secret_strings)
+  end
+
+  defp uri_credentials(uris) do
+    uris
     |> Enum.reject(&is_nil/1)
     |> Enum.map(fn uri -> uri |> URI.parse |> Map.get(:userinfo) end)
     |> Enum.reject(&is_nil/1)
     |> Enum.flat_map(&String.split(&1, ":"))
-    Map.put(config, :secret_strings, config.filtered_strings ++ uri_credentials)
   end
 
   defp filter_secret_strings(message, secret_strings) do
