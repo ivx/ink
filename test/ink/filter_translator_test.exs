@@ -8,8 +8,6 @@ defmodule Ink.FilterTranslatorTest do
 
   test "it translates messages to filter secrets" do
     message = {'** Generic server MOEP', ["MOEP", {:msg, :moep}, %{}, :kapott]}
-    expected_result = "GenServer \"MOEP\" terminating\n** (stop) :kapott\n" <>
-      "Last message: {:msg, :[FILTERED]}\nState: %{}"
     assert :skip == Ink.FilterTranslator.translate(
       :debug, :error, :format, message)
   end
