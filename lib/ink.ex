@@ -83,7 +83,7 @@ defmodule Ink do
     |> Enum.reject(&is_nil/1)
     |> Enum.map(fn uri -> uri |> URI.parse |> Map.get(:userinfo) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.flat_map(&String.split(&1, ":"))
+    |> Enum.map(fn userinfo -> String.split(userinfo, ":") |> List.last end)
   end
 
   defp filter_secret_strings(message, secret_strings) do
