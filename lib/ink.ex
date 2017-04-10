@@ -58,9 +58,9 @@ defmodule Ink do
       level: level}
   end
 
-  defp formatted_timestamp({date, {hours, minutes, seconds, microseconds}}) do
+  defp formatted_timestamp({date, {hours, minutes, seconds, milliseconds}}) do
     {date, {hours, minutes, seconds}}
-    |> NaiveDateTime.from_erl!({microseconds, 3})
+    |> NaiveDateTime.from_erl!({milliseconds * 1000, 3})
     |> NaiveDateTime.to_iso8601
   end
 
