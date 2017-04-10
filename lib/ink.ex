@@ -31,7 +31,7 @@ defmodule Ink do
   defp log_message(message, level, timestamp, metadata, config) do
     if Logger.compare_levels(level, config.level) != :lt do
       message
-      |> base_map(timestamp)
+      |> base_map(timestamp, level)
       |> Map.merge(Enum.into(metadata, %{}))
       |> Poison.encode
       |> log_json(config)
@@ -49,11 +49,13 @@ defmodule Ink do
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
-  defp base_map(message, timestamp) when is_binary(message) do
-    %{message: message, timestamp: formatted_timestamp(timestamp)}
+  defp base_map(message, timestamp, level) when is_binary(message) do
+    %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
   end
-  defp base_map(message, timestamp) do
-    %{message: inspect(message), timestamp: formatted_timestamp(timestamp)}
+  defp base_map(message, timestamp, level) do
+    %{message: inspect(message),
+      timestamp: formatted_timestamp(timestamp),
+      level: level}
   end
 
   defp formatted_timestamp({date, {hours, minutes, seconds, microseconds}}) do
