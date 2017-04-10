@@ -61,7 +61,8 @@ defmodule Ink do
   defp formatted_timestamp({date, {hours, minutes, seconds, milliseconds}}) do
     {date, {hours, minutes, seconds}}
     |> NaiveDateTime.from_erl!({milliseconds * 1000, 3})
-    |> NaiveDateTime.to_iso8601
+    |> DateTime.from_naive!("Etc/UTC")
+    |> DateTime.to_iso8601
   end
 
   defp update_secret_strings(config) do
