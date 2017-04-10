@@ -58,10 +58,8 @@ defmodule Ink do
   defp base_map(message, timestamp, level) when is_binary(message) do
     %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
   end
-  defp base_map(message, timestamp, level) do
-    %{message: inspect(message),
-      timestamp: formatted_timestamp(timestamp),
-      level: level}
+  defp base_map(message, timestamp, level) when is_list(message) do
+    base_map(IO.iodata_to_binary(message), timestamp, level)
   end
 
   defp formatted_timestamp({date, {hours, minutes, seconds, milliseconds}}) do

@@ -26,6 +26,14 @@ defmodule InkTest do
     assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
   end
 
+  test "it logs an IO list" do
+    Logger.info(["test", ["with", "list"]])
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    decoded_msg = Poison.decode!(msg)
+    assert "testwithlist" == decoded_msg["message"]
+  end
+
   test "it includes an ISO 8601 timestamp" do
     Logger.info("test")
 
