@@ -20,7 +20,9 @@ defmodule InkTest do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "test", "timestamp" => timestamp} = Poison.decode!(msg)
+    assert %{"message" => "test",
+             "timestamp" => timestamp,
+             "level" => "info"} = Poison.decode!(msg)
     assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
   end
 
