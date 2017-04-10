@@ -32,10 +32,16 @@ defmodule Ink do
     if Logger.compare_levels(level, config.level) != :lt do
       message
       |> base_map(timestamp, level)
-      |> Map.merge(Enum.into(metadata, %{}))
+      |> Map.merge(filter_metadata(metadata, config))
       |> Poison.encode
       |> log_json(config)
     end
+  end
+
+  defp filter_metadata(metadata, config) do
+    metadata
+    |> Enum.filter(fn {key, _} -> key in config.metadata end)
+    |> Enum.into(%{})
   end
 
   defp log_json({:ok, json}, config) do
@@ -92,7 +98,8 @@ defmodule Ink do
       filtered_strings: [],
       filtered_uri_credentials: [],
       secret_strings: [],
-      io_device: :stdio
+      io_device: :stdio,
+      metadata: [:application, :module, :function, :file, :line, :pid]
     }
   end
 end
