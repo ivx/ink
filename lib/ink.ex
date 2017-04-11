@@ -56,7 +56,7 @@ defmodule Ink do
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
   defp base_map(message, timestamp, level) when is_binary(message) do
-    %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
+    %{log: message, timestamp: formatted_timestamp(timestamp), level: level}
   end
   defp base_map(message, timestamp, level) when is_list(message) do
     base_map(IO.iodata_to_binary(message), timestamp, level)
@@ -81,7 +81,7 @@ defmodule Ink do
     |> Enum.reject(&is_nil/1)
     |> Enum.map(fn uri -> uri |> URI.parse |> Map.get(:userinfo) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn userinfo -> String.split(userinfo, ":") |> List.last end)
+    |> Enum.map(fn userinfo -> userinfo |> String.split(":") |> List.last end)
   end
 
   defp filter_secret_strings(message, secret_strings) do

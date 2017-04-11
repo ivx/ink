@@ -20,7 +20,7 @@ defmodule InkTest do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "test",
+    assert %{"log" => "test",
              "timestamp" => timestamp,
              "level" => "info"} = Poison.decode!(msg)
     assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
@@ -31,7 +31,7 @@ defmodule InkTest do
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     decoded_msg = Poison.decode!(msg)
-    assert "testwithlist" == decoded_msg["message"]
+    assert "testwithlist" == decoded_msg["log"]
   end
 
   test "it includes an ISO 8601 timestamp" do
@@ -65,7 +65,7 @@ defmodule InkTest do
     Logger.info("this is moep")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "this is [FILTERED]"} = Poison.decode!(msg)
+    assert %{"log" => "this is [FILTERED]"} = Poison.decode!(msg)
   end
 
   test "it filters secret strings" do
@@ -73,7 +73,7 @@ defmodule InkTest do
     Logger.info("this is a SECRET string")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "this is a [FILTERED] string"} = Poison.decode!(msg)
+    assert %{"log" => "this is a [FILTERED] string"} = Poison.decode!(msg)
   end
 
   test "it filters URI credentials" do
@@ -87,7 +87,7 @@ defmodule InkTest do
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     assert %{
-      "message" => "the credentials from your URI are guest and [FILTERED]"
+      "log" => "the credentials from your URI are guest and [FILTERED]"
     } = Poison.decode!(msg)
   end
 end
