@@ -41,6 +41,10 @@ defmodule Ink do
   defp filter_metadata(metadata, config) do
     metadata
     |> Enum.filter(fn {key, _} -> key in config.metadata end)
+    |> Enum.map(fn
+      {:pid, value} -> {:erlang_pid, value}
+      other -> other
+    end)
     |> Enum.into(%{})
   end
 

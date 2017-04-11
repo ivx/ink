@@ -54,6 +54,16 @@ defmodule InkTest do
     assert 1 == decoded_msg["included"]
   end
 
+  test "it renames the pid field" do
+    Logger.configure_backend(Ink, metadata: [:pid])
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    decoded_msg = Poison.decode!(msg)
+    assert nil == decoded_msg["pid"]
+    assert inspect(self()) == decoded_msg["erlang_pid"]
+  end
+
   test "respects log level" do
     Logger.configure_backend(Ink, level: :warn)
     Logger.info("test")
