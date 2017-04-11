@@ -67,7 +67,6 @@ defmodule InkTest do
   end
 
   test "it renames the pid field" do
-    Logger.configure_backend(Ink, metadata: [:pid])
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}

@@ -32,21 +32,30 @@ defmodule Ink do
     if Logger.compare_levels(level, config.level) != :lt do
       message
       |> base_map(timestamp, level)
-      |> Map.merge(filter_metadata(metadata, config))
+      |> Map.merge(process_metadata(metadata, config))
       |> Poison.encode
       |> log_json(config)
     end
   end
 
-  defp filter_metadata(metadata, %{metadata: nil}), do: Enum.into(metadata, %{})
-  defp filter_metadata(metadata, config) do
+  defp process_metadata(metadata, config) do
     metadata
-    |> Enum.filter(fn {key, _} -> key in config.metadata end)
+    |> filter_metadata(config)
+    |> rename_metadata_fields
+    |> Enum.into(%{})
+  end
+
+  defp filter_metadata(metadata, %{metadata: nil}), do: metadata
+  defp filter_metadata(metadata, config) do
+    metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
+  end
+
+  defp rename_metadata_fields(metadata) do
+    metadata
     |> Enum.map(fn
       {:pid, value} -> {:erlang_pid, value}
       other -> other
     end)
-    |> Enum.into(%{})
   end
 
   defp log_json({:ok, json}, config) do
