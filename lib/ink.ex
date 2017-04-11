@@ -60,7 +60,7 @@ defmodule Ink do
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
   defp base_map(message, timestamp, level) when is_binary(message) do
-    %{log: message, timestamp: formatted_timestamp(timestamp), level: level}
+    %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
   end
   defp base_map(message, timestamp, level) when is_list(message) do
     base_map(IO.iodata_to_binary(message), timestamp, level)
