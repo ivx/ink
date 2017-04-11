@@ -38,6 +38,7 @@ defmodule Ink do
     end
   end
 
+  defp filter_metadata(metadata, %{metadata: nil}), do: Enum.into(metadata, %{})
   defp filter_metadata(metadata, config) do
     metadata
     |> Enum.filter(fn {key, _} -> key in config.metadata end)
@@ -101,7 +102,7 @@ defmodule Ink do
       filtered_uri_credentials: [],
       secret_strings: [],
       io_device: :stdio,
-      metadata: [:application, :module, :function, :file, :line, :pid]
+      metadata: nil
     }
   end
 end

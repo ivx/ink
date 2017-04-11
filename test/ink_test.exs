@@ -43,6 +43,18 @@ defmodule InkTest do
     assert timestamp =~ ~r/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
   end
 
+  test "it logs all metadata if not configured" do
+    Logger.metadata(not_included: 1, included: 1)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    decoded_msg = Poison.decode!(msg)
+    assert 1 == decoded_msg["not_included"]
+    assert 1 == decoded_msg["included"]
+    assert "test it logs all metadata if not configured/1" ==
+      decoded_msg["function"]
+  end
+
   test "it only includes configured metadata" do
     Logger.configure_backend(Ink, metadata: [:included])
     Logger.metadata(not_included: 1, included: 1)
