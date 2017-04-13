@@ -1,5 +1,7 @@
 # Ink
 
+[![Build Status](https://travis-ci.org/ivx/ink.svg?branch=master)](https://travis-ci.org/ivx/ink)
+
 Ink is a backend for the Elixir `Logger` with two main purposes:
 
 - to log JSON documents instead of normal log lines
