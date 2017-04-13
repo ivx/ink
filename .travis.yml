@@ -5,3 +5,6 @@ matrix:
       elixir: 1.4.2
     - otp_release: 19.3
       elixir: 1.4.2
+after_script:
+  - mix deps.get --only docs
+  - MIX_ENV=docs mix inch.report
