@@ -67,7 +67,7 @@ defmodule Ink do
         metadata: [:pid, :my_field]
 
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
-   LogStash expect an integer if they encount a field named `pid`. Therefore,
+   LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
   """
 
