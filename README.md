@@ -10,7 +10,7 @@ Ink is a backend for the Elixir `Logger` with two main purposes:
 
 ## Installation
 
-Just add `:ink` to your dependencies and `mix deps.get`.
+Just add `:ink` to your dependencies and run `mix deps.get`.
 
 ```elixir
 def deps do
@@ -26,16 +26,7 @@ The only thing you have to do is drop some lines into your config.
 # this will add Ink as the only backend for Logger
 config :logger,
   backends: [Ink]
-
-config :logger, Ink,
-  # remove secret strings from you logs
-  filtered_strings: ["password", System.get_env("SECRET")]
-
-# this is optional but recommended if you don't want secrets in your log files
-# it will prevent crash and supervisor reports from being printed to the terminal
-config :sasl, sasl_error_logger: false
 ```
 
-Since JSON logs are hard to read when they are not parsed by i.e. LogStash, we
-recommend you only use Ink in your production environment. But you can put the
-same config in `dev.exs` for testing, of course.
+For more information on how to use `Ink`, take a look
+at [the docs](https://hexdocs.pm/ink/Ink.html).
