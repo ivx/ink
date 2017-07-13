@@ -2,9 +2,11 @@ language: elixir
 matrix:
   include:
     - otp_release: 18.3
-      elixir: 1.4.2
+      elixir: 1.4.5
     - otp_release: 19.3
-      elixir: 1.4.2
+      elixir: 1.4.5
+    - otp_release: 20.0
+      elixir: 1.4.5
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
