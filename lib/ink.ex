@@ -71,7 +71,7 @@ defmodule Ink do
    `Ink` will log the PID as `erlang_pid`.
   """
 
-  use GenEvent
+  @behaviour :gen_event
 
   def init(__MODULE__) do
     {:ok, configure(Application.get_env(:logger, Ink, []), default_options())}
@@ -91,6 +91,18 @@ defmodule Ink do
 
   def handle_event({level, _, {Logger, message, timestamp, metadata}}, state) do
     log_message(message, level, timestamp, metadata, state)
+    {:ok, state}
+  end
+
+  def handle_info(_msg, state) do
+    {:ok, state}
+  end
+
+  def terminate(_reason, _state) do
+    :ok
+  end
+
+  def code_change(_old, state, _extra) do
     {:ok, state}
   end
 
