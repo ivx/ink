@@ -3,7 +3,7 @@ defmodule Ink.Mixfile do
 
   def project do
     [app: :ink,
-     version: "0.7.3",
+     version: "0.7.4",
      elixir: "~> 1.4",
      build_embedded: Mix.env == :prod,
      start_permanent: Mix.env == :prod,
