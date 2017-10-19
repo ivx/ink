@@ -2,14 +2,16 @@ defmodule Ink.Mixfile do
   use Mix.Project
 
   def project do
-    [app: :ink,
-     version: "0.7.4",
-     elixir: "~> 1.4",
-     build_embedded: Mix.env == :prod,
-     start_permanent: Mix.env == :prod,
-     description: description(),
-     package: package(),
-     deps: deps()]
+    [
+      app: :ink,
+      version: "0.7.4",
+      elixir: "~> 1.4",
+      build_embedded: Mix.env() == :prod,
+      start_permanent: Mix.env() == :prod,
+      description: description(),
+      package: package(),
+      deps: deps()
+    ]
   end
 
   # Configuration for the OTP application
@@ -27,13 +29,13 @@ defmodule Ink.Mixfile do
   end
 
   defp package do
-    [name: :ink,
-     files: ["lib",
-             "mix.exs",
-             "README*"],
-     maintainers: ["Mario Mainz"],
-     licenses: ["MIT"],
-     links: %{"GitHub" => "https://github.com/ivx/ink"}]
+    [
+      name: :ink,
+      files: ["lib", "mix.exs", "README*"],
+      maintainers: ["Mario Mainz"],
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/ivx/ink"}
+    ]
   end
 
   # Dependencies can be Hex packages:
@@ -46,9 +48,11 @@ defmodule Ink.Mixfile do
   #
   # Type "mix help deps" for more examples and options
   defp deps do
-    [{:poison, "~> 2.2 or ~> 3.1"},
-     {:inch_ex, "~> 0.5", only: :docs},
-     {:credo, "~> 0.7", only: [:dev, :test]},
-     {:ex_doc, ">= 0.0.0", only: :dev}]
+    [
+      {:poison, "~> 2.2 or ~> 3.1"},
+      {:inch_ex, "~> 0.5", only: :docs},
+      {:credo, "~> 0.7", only: [:dev, :test]},
+      {:ex_doc, ">= 0.0.0", only: :dev}
+    ]
   end
 end
