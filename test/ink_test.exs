@@ -6,10 +6,11 @@ defmodule InkTest do
   setup do
     {:ok, _} = Logger.add_backend(Ink)
     Logger.configure_backend(Ink, io_device: self())
-    on_exit fn ->
-      Logger.flush
+
+    on_exit(fn ->
+      Logger.flush()
       Logger.remove_backend(Ink)
-    end
+    end)
   end
 
   test "it can be configured" do
@@ -20,9 +21,10 @@ defmodule InkTest do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "test",
-             "timestamp" => timestamp,
-             "level" => "info"} = Poison.decode!(msg)
+
+    assert %{"message" => "test", "timestamp" => timestamp, "level" => "info"} =
+             Poison.decode!(msg)
+
     assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
   end
 
@@ -51,8 +53,9 @@ defmodule InkTest do
     decoded_msg = Poison.decode!(msg)
     assert 1 == decoded_msg["not_included"]
     assert 1 == decoded_msg["included"]
+
     assert "test it logs all metadata if not configured/1" ==
-      decoded_msg["function"]
+             decoded_msg["function"]
   end
 
   test "it only includes configured metadata" do
@@ -98,17 +101,20 @@ defmodule InkTest do
   end
 
   test "it filters URI credentials" do
-    Logger.configure_backend(
-      Ink, filtered_uri_credentials: ["amqp://guest:password@rabbitmq:5672",
-                                      "redis://redis:6379/4",
-                                      "",
-                                      "blarg",
-                                      nil])
+    Logger.configure_backend(Ink, filtered_uri_credentials: [
+      "amqp://guest:password@rabbitmq:5672",
+      "redis://redis:6379/4",
+      "",
+      "blarg",
+      nil
+    ])
+
     Logger.info("the credentials from your URI are guest and password")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+
     assert %{
-      "message" => "the credentials from your URI are guest and [FILTERED]"
-    } = Poison.decode!(msg)
+             "message" => "the credentials from your URI are guest and [FILTERED]"
+           } = Poison.decode!(msg)
   end
 end

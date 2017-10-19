@@ -3,7 +3,7 @@ defmodule EncoderTest do
 
   test "it can JSON encode PIDs" do
     assert Poison.encode!(%{pid: :c.pid(0, 250, 0)}) ==
-      "{\"pid\":\"#PID<0.250.0>\"}"
+             "{\"pid\":\"#PID<0.250.0>\"}"
   end
 
   test "it can JSON encode Ports" do

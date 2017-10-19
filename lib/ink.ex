@@ -117,7 +117,7 @@ defmodule Ink do
       message
       |> base_map(timestamp, level)
       |> Map.merge(process_metadata(metadata, config))
-      |> Poison.encode
+      |> Poison.encode()
       |> log_json(config)
     end
   end
@@ -130,6 +130,7 @@ defmodule Ink do
   end
 
   defp filter_metadata(metadata, %{metadata: nil}), do: metadata
+
   defp filter_metadata(metadata, config) do
     metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
   end
@@ -137,9 +138,9 @@ defmodule Ink do
   defp rename_metadata_fields(metadata) do
     metadata
     |> Enum.map(fn
-      {:pid, value} -> {:erlang_pid, value}
-      other -> other
-    end)
+         {:pid, value} -> {:erlang_pid, value}
+         other -> other
+       end)
   end
 
   defp log_json({:ok, json}, config) do
@@ -147,8 +148,9 @@ defmodule Ink do
     |> filter_secret_strings(config.secret_strings)
     |> log_to_device(config.io_device)
   end
+
   defp log_json(other, config) do
-    if Mix.env == :dev, do: log_to_device(inspect(other), config.io_device)
+    if Mix.env() == :dev, do: log_to_device(inspect(other), config.io_device)
   end
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
@@ -156,6 +158,7 @@ defmodule Ink do
   defp base_map(message, timestamp, level) when is_binary(message) do
     %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
   end
+
   defp base_map(message, timestamp, level) when is_list(message) do
     base_map(IO.iodata_to_binary(message), timestamp, level)
   end
@@ -164,22 +167,24 @@ defmodule Ink do
     {date, {hours, minutes, seconds}}
     |> NaiveDateTime.from_erl!({milliseconds * 1000, 3})
     |> DateTime.from_naive!("Etc/UTC")
-    |> DateTime.to_iso8601
+    |> DateTime.to_iso8601()
   end
 
   defp update_secret_strings(config) do
-    secret_strings = config.filtered_strings
-    |> Kernel.++(uri_credentials(config.filtered_uri_credentials))
-    |> Enum.reject(fn s -> s == "" || is_nil(s) end)
+    secret_strings =
+      config.filtered_strings
+      |> Kernel.++(uri_credentials(config.filtered_uri_credentials))
+      |> Enum.reject(fn s -> s == "" || is_nil(s) end)
+
     Map.put(config, :secret_strings, secret_strings)
   end
 
   defp uri_credentials(uris) do
     uris
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn uri -> uri |> URI.parse |> Map.get(:userinfo) end)
+    |> Enum.map(fn uri -> uri |> URI.parse() |> Map.get(:userinfo) end)
     |> Enum.reject(&is_nil/1)
-    |> Enum.map(fn userinfo -> userinfo |> String.split(":") |> List.last end)
+    |> Enum.map(fn userinfo -> userinfo |> String.split(":") |> List.last() end)
   end
 
   defp filter_secret_strings(message, secret_strings) do
