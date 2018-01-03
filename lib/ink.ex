@@ -138,9 +138,9 @@ defmodule Ink do
   defp rename_metadata_fields(metadata) do
     metadata
     |> Enum.map(fn
-         {:pid, value} -> {:erlang_pid, value}
-         other -> other
-       end)
+      {:pid, value} -> {:erlang_pid, value}
+      other -> other
+    end)
   end
 
   defp log_json({:ok, json}, config) do

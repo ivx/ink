@@ -101,20 +101,24 @@ defmodule InkTest do
   end
 
   test "it filters URI credentials" do
-    Logger.configure_backend(Ink, filtered_uri_credentials: [
-      "amqp://guest:password@rabbitmq:5672",
-      "redis://redis:6379/4",
-      "",
-      "blarg",
-      nil
-    ])
+    Logger.configure_backend(
+      Ink,
+      filtered_uri_credentials: [
+        "amqp://guest:password@rabbitmq:5672",
+        "redis://redis:6379/4",
+        "",
+        "blarg",
+        nil
+      ]
+    )
 
     Logger.info("the credentials from your URI are guest and password")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
 
     assert %{
-             "message" => "the credentials from your URI are guest and [FILTERED]"
+             "message" =>
+               "the credentials from your URI are guest and [FILTERED]"
            } = Poison.decode!(msg)
   end
 end
