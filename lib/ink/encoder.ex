@@ -10,6 +10,12 @@ defmodule Ink.Encoder do
               is_tuple(value) or is_function(value),
        do: inspect(value)
 
+  defp encode_value(%{__struct__: _} = value) do
+    value
+    |> Map.from_struct
+    |> encode_value
+  end
+
   defp encode_value(value) when is_map(value) do
     Enum.into(value, %{}, fn {k, v} ->
       {encode_value(k), encode_value(v)}
