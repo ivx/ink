@@ -50,7 +50,7 @@ defmodule Ink.Mixfile do
   defp deps do
     [
       {:poison, "~> 2.2 or ~> 3.1"},
-      {:inch_ex, "~> 0.5", only: :docs},
+      {:inch_ex, "~> 1.0", only: :docs},
       {:credo, "~> 0.7", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
