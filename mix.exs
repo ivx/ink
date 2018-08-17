@@ -10,7 +10,14 @@ defmodule Ink.Mixfile do
       start_permanent: Mix.env() == :prod,
       description: description(),
       package: package(),
-      deps: deps()
+      deps: deps(),
+      name: "Ink",
+      source_url: "https://github.com/ivx/ink",
+      homepage_url: "https://github.com/ivx/ink",
+      docs: [
+        main: "Ink",
+        extras: ["README.md"]
+      ]
     ]
   end
 

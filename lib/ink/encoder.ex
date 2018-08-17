@@ -1,4 +1,14 @@
 defmodule Ink.Encoder do
+  @moduledoc """
+  Responsible for encoding any value to JSON. Uses `Poison` for the JSON
+  encoding, but converts values that are not handled by `Poison` before that,
+  like tuples or PIDs.
+  """
+
+  @doc """
+  Accepts a map and recursively replaces all JSON incompatible values with JSON
+  encodable values. Then converts the map to JSON.
+  """
   def encode(map) do
     map
     |> encode_value
