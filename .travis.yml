@@ -9,6 +9,10 @@ matrix:
       elixir: 1.7.2
     - otp_release: 21.0
       elixir: 1.7.2
+script:
+  - mix format --check-formatted
+  - mix credo --strict
+  - mix test
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
