@@ -12,7 +12,7 @@ defmodule Ink.Encoder do
 
   defp encode_value(%{__struct__: _} = value) do
     value
-    |> Map.from_struct
+    |> Map.from_struct()
     |> encode_value
   end
 
