@@ -1,6 +1,10 @@
 defmodule Ink.EncoderTest do
   use ExUnit.Case, async: true
 
+  defmodule TestStruct do
+    defstruct [:field]
+  end
+
   test "it can encode PIDs" do
     assert {:ok, ~s({"pid":"#PID<0.250.0>"})} ==
              Ink.Encoder.encode(%{pid: :c.pid(0, 250, 0)})
@@ -33,6 +37,11 @@ defmodule Ink.EncoderTest do
   test "it recursively encodes maps" do
     assert {:ok, ~s({"stuff":{"pid":"#PID<0.250.0>"}})} ==
              Ink.Encoder.encode(%{stuff: %{pid: :c.pid(0, 250, 0)}})
+  end
+
+  test "it recursively encodes struct" do
+    assert {:ok, ~s({"field":{"pid":"#PID<0.250.0>"}})} ==
+             Ink.Encoder.encode(%TestStruct{field: %{pid: :c.pid(0, 250, 0)}})
   end
 
   test "it encodes map keys" do
