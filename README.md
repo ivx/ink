@@ -30,3 +30,10 @@ config :logger,
 
 For more information on how to use `Ink`, take a look
 at [the docs](https://hexdocs.pm/ink/Ink.html).
+
+## Maintenance
+
+- get dependencies with `mix deps.get`
+- execute tests with `mix test`
+- update dependencies with `mix deps.update --all`
+- execute tests again `mix test`

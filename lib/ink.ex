@@ -117,7 +117,7 @@ defmodule Ink do
       message
       |> base_map(timestamp, level)
       |> Map.merge(process_metadata(metadata, config))
-      |> Poison.encode()
+      |> Ink.Encoder.encode()
       |> log_json(config)
     end
   end

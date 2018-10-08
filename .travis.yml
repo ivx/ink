@@ -1,16 +1,18 @@
 language: elixir
 matrix:
   include:
-    - otp_release: 20.0
-      elixir: 1.5.0
-    - otp_release: 20.0
-      elixir: 1.5.1
-    - otp_release: 20.0
-      elixir: 1.5.2
     - otp_release: 20.3
-      elixir: 1.6.2
+      elixir: 1.6.6
+    - otp_release: 21.0
+      elixir: 1.6.6
     - otp_release: 20.3
-      elixir: 1.6.5
+      elixir: 1.7.2
+    - otp_release: 21.0
+      elixir: 1.7.2
+script:
+  - mix format --check-formatted
+  - mix credo --strict
+  - mix test
 after_script:
   - mix deps.get --only docs
   - MIX_ENV=docs mix inch.report
