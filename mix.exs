@@ -56,7 +56,7 @@ defmodule Ink.Mixfile do
   # Type "mix help deps" for more examples and options
   defp deps do
     [
-      {:poison, "~> 2.2 or ~> 3.1"},
+      {:poison, "~> 2.2 or ~> 3.1 or ~> 4.0"},
       {:inch_ex, "~> 2.0", only: :docs},
       {:credo, "~> 1.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev}
