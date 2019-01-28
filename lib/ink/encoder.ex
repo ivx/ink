@@ -12,7 +12,7 @@ defmodule Ink.Encoder do
   def encode(map) do
     map
     |> encode_value
-    |> Poison.encode()
+    |> Jason.encode()
   end
 
   defp encode_value(value)
