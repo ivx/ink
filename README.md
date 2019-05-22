@@ -26,6 +26,10 @@ The only thing you have to do is drop some lines into your config.
 # this will add Ink as the only backend for Logger
 config :logger,
   backends: [Ink]
+
+# at least configure a name for your app
+config :logger, Ink,
+  name: "your app"
 ```
 
 For more information on how to use `Ink`, take a look

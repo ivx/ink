@@ -10,12 +10,14 @@ defmodule Ink do
 
       # optional additional configuration
       config :logger, Ink,
+        name: "your app",
         level: :info
 
   ### Options
 
   In total, the following options are supported by `Ink`:
 
+  - `:name` the name of your app that will be added to all logs
   - `:io_device` the IO device the logs are written to (default: `:stdio`)
   - `:level` the minimum log level for outputting messages (default: `:debug`)
   - `:filtered_strings` secret strings that should not be printed in logs
@@ -226,6 +228,8 @@ defmodule Ink do
   end
 
   defp name do
-    Mix.Project.config() |> Keyword.fetch!(:app)
+    :logger
+    |> Application.get_env(Ink)
+    |> Keyword.fetch!(:name)
   end
 end
