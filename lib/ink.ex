@@ -156,7 +156,15 @@ defmodule Ink do
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
   defp base_map(message, timestamp, level) when is_binary(message) do
-    %{message: message, timestamp: formatted_timestamp(timestamp), level: level}
+    %{
+      name: name(),
+      pid: System.get_pid() |> String.to_integer(),
+      hostname: hostname(),
+      msg: message,
+      time: formatted_timestamp(timestamp),
+      level: level(level),
+      v: 0
+    }
   end
 
   defp base_map(message, timestamp, level) when is_list(message) do
@@ -202,5 +210,22 @@ defmodule Ink do
       io_device: :stdio,
       metadata: nil
     }
+  end
+
+  defp level(level) do
+    case level do
+      :debug -> 20
+      :info -> 30
+      :warn -> 40
+      :error -> 50
+    end
+  end
+
+  defp hostname do
+    with {:ok, hostname} <- :inet.gethostname(), do: List.to_string(hostname)
+  end
+
+  defp name do
+    Mix.Project.config() |> Keyword.fetch!(:app)
   end
 end

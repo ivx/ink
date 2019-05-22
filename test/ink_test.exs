@@ -22,8 +22,18 @@ defmodule InkTest do
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
 
-    assert %{"message" => "test", "timestamp" => timestamp, "level" => "info"} =
-             Jason.decode!(msg)
+    assert %{
+             "name" => "ink",
+             "hostname" => hostname,
+             "pid" => pid,
+             "msg" => "test",
+             "time" => timestamp,
+             "level" => 30,
+             "v" => 0
+           } = Jason.decode!(msg)
+
+    assert is_binary(hostname)
+    assert is_integer(pid)
 
     assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
   end
@@ -33,14 +43,14 @@ defmodule InkTest do
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     decoded_msg = Jason.decode!(msg)
-    assert "testwithlist" == decoded_msg["message"]
+    assert "testwithlist" == decoded_msg["msg"]
   end
 
   test "it includes an ISO 8601 timestamp" do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"timestamp" => timestamp} = Jason.decode!(msg)
+    assert %{"time" => timestamp} = Jason.decode!(msg)
     assert {:ok, _, 0} = DateTime.from_iso8601(timestamp)
     assert timestamp =~ ~r/\d\d\d\d-\d\d-\d\dT\d\d:\d\d:\d\d.\d\d\dZ/
   end
@@ -69,12 +79,11 @@ defmodule InkTest do
     assert 1 == decoded_msg["included"]
   end
 
-  test "it renames the pid field" do
+  test "it puts the erlang process pid into erlang_pid" do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     decoded_msg = Jason.decode!(msg)
-    assert nil == decoded_msg["pid"]
     assert inspect(self()) == decoded_msg["erlang_pid"]
   end
 
@@ -89,7 +98,7 @@ defmodule InkTest do
     Logger.info("this is moep")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "this is [FILTERED]"} = Jason.decode!(msg)
+    assert %{"msg" => "this is [FILTERED]"} = Jason.decode!(msg)
   end
 
   test "it filters secret strings" do
@@ -97,7 +106,7 @@ defmodule InkTest do
     Logger.info("this is a SECRET string")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert %{"message" => "this is a [FILTERED] string"} = Jason.decode!(msg)
+    assert %{"msg" => "this is a [FILTERED] string"} = Jason.decode!(msg)
   end
 
   test "it filters URI credentials" do
@@ -117,8 +126,7 @@ defmodule InkTest do
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
 
     assert %{
-             "message" =>
-               "the credentials from your URI are guest and [FILTERED]"
+             "msg" => "the credentials from your URI are guest and [FILTERED]"
            } = Jason.decode!(msg)
   end
 end
