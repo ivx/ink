@@ -6,7 +6,7 @@ matrix:
     - otp_release: 22.0
       elixir: 1.8.2
     - otp_release: 22.0
-      elixir: 1.9.2
+      elixir: 1.9.4
 script:
   - mix format --check-formatted
   - mix credo --strict
