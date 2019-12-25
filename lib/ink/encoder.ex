@@ -1,7 +1,7 @@
 defmodule Ink.Encoder do
   @moduledoc """
-  Responsible for encoding any value to JSON. Uses `Poison` for the JSON
-  encoding, but converts values that are not handled by `Poison` before that,
+  Responsible for encoding any value to JSON. Uses `Jason` for the JSON
+  encoding, but converts values that are not handled by `Jason` before that,
   like tuples or PIDs.
   """
 
