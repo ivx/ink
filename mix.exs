@@ -11,6 +11,7 @@ defmodule Ink.Mixfile do
       description: description(),
       package: package(),
       deps: deps(),
+      aliases: aliases(),
       name: "Ink",
       source_url: "https://github.com/ivx/ink",
       homepage_url: "https://github.com/ivx/ink",
@@ -61,5 +62,13 @@ defmodule Ink.Mixfile do
       {:credo, "~> 1.0", only: [:dev, :test]},
       {:ex_doc, ">= 0.0.0", only: :dev}
     ]
+  end
+
+  defp aliases do
+    [version: &version/1]
+  end
+
+  defp version(_) do
+    IO.puts(project()[:version])
   end
 end
