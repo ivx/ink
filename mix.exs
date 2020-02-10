@@ -5,7 +5,7 @@ defmodule Ink.Mixfile do
     [
       app: :ink,
       version: "1.0.2",
-      elixir: "~> 1.10",
+      elixir: "~> 1.8",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: description(),
