@@ -129,6 +129,7 @@ defmodule Ink do
     |> filter_metadata(config)
     |> rename_metadata_fields
     |> Enum.into(%{})
+    |> Map.delete(:time)
   end
 
   defp filter_metadata(metadata, %{metadata: nil}), do: metadata
