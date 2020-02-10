@@ -4,8 +4,8 @@ defmodule Ink.Mixfile do
   def project do
     [
       app: :ink,
-      version: "1.0.1",
-      elixir: "~> 1.4",
+      version: "1.0.2",
+      elixir: "~> 1.10",
       build_embedded: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       description: description(),
