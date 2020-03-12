@@ -129,4 +129,12 @@ defmodule InkTest do
              "msg" => "the credentials from your URI are guest and [FILTERED]"
            } = Jason.decode!(msg)
   end
+
+  test "respects exclude hostname " do
+    Logger.configure_backend(Ink, exclude_hostname: true)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert msg |> Jason.decode!() |> Map.get("hostname", :excluded) == :excluded
+  end
 end
