@@ -172,7 +172,7 @@ defmodule Ink do
     }
   end
 
-  defp base_map(message, timestamp, level, config) when is_binary(message) do
+  defp base_map(message, timestamp, level, _) when is_binary(message) do
     %{
       name: name(),
       pid: System.get_pid() |> String.to_integer(),
