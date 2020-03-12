@@ -26,6 +26,8 @@ defmodule Ink do
   (default: `[]`)
   - `:metadata` the metadata keys that should be included in the logs (default:
   all)
+   - `:exclude_hostname` exclude local `hostname` from the log (default:
+  false)
 
   ### Filtering secrets
 
@@ -117,7 +119,7 @@ defmodule Ink do
   defp log_message(message, level, timestamp, metadata, config) do
     if Logger.compare_levels(level, config.level) != :lt do
       message
-      |> base_map(timestamp, level)
+      |> base_map(timestamp, level, config)
       |> Map.merge(process_metadata(metadata, config))
       |> Ink.Encoder.encode()
       |> log_json(config)
@@ -158,7 +160,19 @@ defmodule Ink do
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
-  defp base_map(message, timestamp, level) when is_binary(message) do
+  defp base_map(message, timestamp, level, %{exclude_hostname: true} = _config)
+       when is_binary(message) do
+    %{
+      name: name(),
+      pid: System.get_pid() |> String.to_integer(),
+      msg: message,
+      time: formatted_timestamp(timestamp),
+      level: level(level),
+      v: 0
+    }
+  end
+
+  defp base_map(message, timestamp, level, config) when is_binary(message) do
     %{
       name: name(),
       pid: System.get_pid() |> String.to_integer(),
@@ -170,8 +184,8 @@ defmodule Ink do
     }
   end
 
-  defp base_map(message, timestamp, level) when is_list(message) do
-    base_map(IO.iodata_to_binary(message), timestamp, level)
+  defp base_map(message, timestamp, level, config) when is_list(message) do
+    base_map(IO.iodata_to_binary(message), timestamp, level, config)
   end
 
   defp formatted_timestamp({date, {hours, minutes, seconds, milliseconds}}) do
