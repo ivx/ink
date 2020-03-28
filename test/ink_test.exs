@@ -137,4 +137,22 @@ defmodule InkTest do
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     assert msg |> Jason.decode!() |> Map.get("hostname", :excluded) == :excluded
   end
+
+  test "send a log to integrated backend" do
+    Logger.configure_backend(
+      Ink, 
+      adapters: [
+        {
+          Ink.Adapter.Logstash,
+          config: %{
+            host: "127.0.0.1",
+            port: 10001,
+            type: :udp
+          }
+        }
+      ]
+    )
+
+    Logger.info("Logstash log :)")
+  end
 end

@@ -73,6 +73,28 @@ defmodule Ink do
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
    LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
+
+  ### Add backend integration
+
+  #### Available backends
+  
+  If you want to send both the device and the integrated adapter, you can 
+  configure `send_multipe: true`.
+
+  - Logstash  
+
+  Config:  
+
+      config :logger, Ink,
+        adapters: [
+          {
+            Ink.Adapter.Logtash, 
+            config: %{
+              host: "127.0.0.1",
+              port: 10001
+            }
+          } 
+        ]
   """
 
   @behaviour :gen_event
@@ -111,9 +133,51 @@ defmodule Ink do
   end
 
   defp configure(options, state) do
-    state
-    |> Map.merge(Enum.into(options, %{}))
-    |> update_secret_strings
+    Map.merge(state, Enum.into(options, %{}))
+    |> update_secret_strings()
+    |> update_adapters()
+  end
+
+  defp update_adapters(options) do
+    Map.put(options, :adapters, configure_adapters(options.adapters))
+  end
+
+  defp configure_adapters([head | tail]) do
+    {module, attrs} = head
+
+    config = Keyword.get(attrs, :config)
+    host = Map.get(config, :host, nil)
+    port = Map.get(config, :port, nil)
+    type = Map.get(config, :type, nil)
+    
+    cond do
+      is_nil(host) or is_nil(port) or is_nil(type) ->
+        configure_adapters(tail)
+      !is_integer(port) ->
+        configure_adapters(tail)
+      !is_atom(type) ->
+        configure_adapters(tail)
+      true ->
+        config = %{
+          module: module,
+          host: host,
+          port: port,
+          socket: nil
+        }
+
+        case type do
+          :udp ->
+            {:ok, socket} = :gen_udp.open(0)
+
+            [Map.put(config, :socket, socket) | configure_adapters(tail)]
+          _ ->
+            configure_adapters(tail)
+        end
+    end
+  end
+
+  defp configure_adapters([]) do
+    []
   end
 
   defp log_message(message, level, timestamp, metadata, config) do
@@ -149,9 +213,18 @@ defmodule Ink do
   end
 
   defp log_json({:ok, json}, config) do
-    json
-    |> filter_secret_strings(config.secret_strings)
-    |> log_to_device(config.io_device)
+    cond do
+      Enum.count(config.adapters) > 0 ->
+        log_to_adapters(
+          config[:adapters], 
+          filter_secret_strings(json, config.secret_strings)
+        )
+      true ->
+        log_to_device(
+          filter_secret_strings(json, config.secret_strings), 
+          config.io_device
+        )
+    end
   end
 
   defp log_json(other, config) do
@@ -159,6 +232,15 @@ defmodule Ink do
   end
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
+
+  defp log_to_adapters([head | tail], msg) do
+    head.module.send(head.socket, head.host, head.port, msg)
+    log_to_adapters(tail, msg)
+  end
+
+  defp log_to_adapters([], _) do
+    :ok
+  end
 
   defp base_map(message, timestamp, level, %{exclude_hostname: true} = _config)
        when is_binary(message) do
@@ -225,7 +307,9 @@ defmodule Ink do
       filtered_uri_credentials: [],
       secret_strings: [],
       io_device: :stdio,
-      metadata: nil
+      metadata: nil,
+      send_multiple: false,
+      adapters: []
     }
   end
 
