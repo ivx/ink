@@ -43,7 +43,6 @@ config :logger,
   backends: [Ink]
 
 config :logger, Ink,
-  send_multiple: true
   adapters: [
     {
       Ink.Adapter.Logtash, 
