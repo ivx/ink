@@ -22,6 +22,14 @@ defmodule Ink.Adapter.Logstash do
   use Ink.Adapter
 
   @doc """
+  Logstash connection type
+  """
+  @spec connection_type() :: Atom.t()
+  def connection_type() do
+    :udp
+  end
+
+  @doc """
   Losgtash send log message
   """
   @spec send(Port.t(), String.t(), Integer.t(), String.t()) ::

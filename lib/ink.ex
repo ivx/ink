@@ -148,7 +148,7 @@ defmodule Ink do
     config = Keyword.get(attrs, :config)
     host = Map.get(config, :host, nil)
     port = Map.get(config, :port, nil)
-    type = Map.get(config, :type, nil)
+    type = module.connection_type()
     
     cond do
       is_nil(host) or is_nil(port) or is_nil(type) ->
