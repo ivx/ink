@@ -77,9 +77,6 @@ defmodule Ink do
   ### Add backend integration
 
   #### Available backends
-  
-  If you want to send both the device and the integrated adapter, you can 
-  configure `send_multipe: true`.
 
   - Logstash  
 
@@ -308,7 +305,6 @@ defmodule Ink do
       secret_strings: [],
       io_device: :stdio,
       metadata: nil,
-      send_multiple: false,
       adapters: []
     }
   end
