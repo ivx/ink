@@ -25,7 +25,7 @@ defmodule Ink.Adapter.Logstash do
   Logstash connection type
   """
   @spec connection_type() :: Atom.t()
-  def connection_type() do
+  def connection_type do
     :udp
   end
 

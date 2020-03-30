@@ -140,13 +140,13 @@ defmodule InkTest do
 
   test "send a log to integrated backend" do
     Logger.configure_backend(
-      Ink, 
+      Ink,
       adapters: [
         {
           Ink.Adapter.Logstash,
           config: %{
             host: "127.0.0.1",
-            port: 10001
+            port: 10_001
           }
         }
       ]
