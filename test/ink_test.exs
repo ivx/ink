@@ -130,11 +130,26 @@ defmodule InkTest do
            } = Jason.decode!(msg)
   end
 
-  test "respects exclude hostname " do
+  test "respects exclude hostname" do
     Logger.configure_backend(Ink, exclude_hostname: true)
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
     assert msg |> Jason.decode!() |> Map.get("hostname", :excluded) == :excluded
+  end
+
+  test "respects log_encoding_error: true" do
+    Logger.configure_backend(Ink, log_encoding_error: true)
+    Logger.info("\xFF")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert msg =~ "{:error, %Jason.EncodeError{message: \"invalid byte 0xFF in <<255>>\"}}"
+  end
+
+  test "respects log_encoding_error: false" do
+    Logger.configure_backend(Ink, log_encoding_error: false)
+    Logger.info("\xFF")
+
+    refute_receive {:io_request, _, _, {:put_chars, :unicode, _msg}}
   end
 end
