@@ -26,8 +26,10 @@ defmodule Ink do
   (default: `[]`)
   - `:metadata` the metadata keys that should be included in the logs (default:
   all)
-   - `:exclude_hostname` exclude local `hostname` from the log (default:
+  - `:exclude_hostname` exclude local `hostname` from the log (default:
   false)
+  - `:log_encoding_error` whether to log errors that happen during JSON encoding
+  (default: true)
 
   ### Filtering secrets
 
@@ -155,7 +157,10 @@ defmodule Ink do
   end
 
   defp log_json(other, config) do
-    if Mix.env() == :dev, do: log_to_device(inspect(other), config.io_device)
+    case config.log_encoding_error do
+      true -> log_to_device(inspect(other), config.io_device)
+      _ -> :ok
+    end
   end
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
