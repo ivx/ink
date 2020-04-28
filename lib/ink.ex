@@ -28,8 +28,8 @@ defmodule Ink do
   all)
   - `:exclude_hostname` exclude local `hostname` from the log (default:
   false)
-  - `:log_encoding_error` whether to log the encoding error, the error will not be
-  JSON-formatted (default: true)
+  - `:log_encoding_error` whether to log errors that happen during JSON encoding
+  (default: true)
 
   ### Filtering secrets
 
