@@ -230,7 +230,9 @@ defmodule Ink do
       filtered_uri_credentials: [],
       secret_strings: [],
       io_device: :stdio,
-      metadata: nil
+      metadata: nil,
+      exclude_hostname: false,
+      log_encoding_error: true
     }
   end
 
