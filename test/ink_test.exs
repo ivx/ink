@@ -152,4 +152,10 @@ defmodule InkTest do
 
     refute_receive {:io_request, _, _, {:put_chars, :unicode, _msg}}
   end
+
+  test "defaults the behavior to log_encoding_error: true" do
+    Logger.info("\xFF")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, _msg}}
+  end
 end
