@@ -150,9 +150,6 @@ defmodule Ink do
     end)
   end
 
-  # Attempts to encode the log content. On error, the original log content
-  # is appended to the return, so subsequent callers can operate on both
-  # the error and the full log content.
   defp encode_map(log) do
     case Ink.Encoder.encode(log) do
       {:ok, _} = result ->
