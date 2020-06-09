@@ -169,10 +169,16 @@ defmodule Ink do
     |> log_to_device(config.io_device)
   end
 
-  defp log_json(other, config) do
+  defp log_json(error, config) do
     case config.log_encoding_error do
-      true -> log_to_device(inspect(other, limit: :infinity), config.io_device)
-      _ -> :ok
+      true ->
+        error
+        |> inspect(limit: :infinity)
+        |> filter_secret_strings(config.secret_strings)
+        |> log_to_device(config)
+
+      _ ->
+        :ok
     end
   end
 
