@@ -143,7 +143,10 @@ defmodule InkTest do
     Logger.info("\xFF")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert msg =~ "{:error, %Jason.EncodeError{message: \"invalid byte 0xFF in <<255>>\"}}"
+    assert msg =~ "{:error, %Jason.EncodeError{message: \"invalid byte 0xFF in <<255>>\"},"
+    assert msg =~ "name:"
+    assert msg =~ "msg:"
+    assert msg =~ "level:"
   end
 
   test "respects log_encoding_error: false" do
