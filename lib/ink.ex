@@ -234,12 +234,13 @@ defmodule Ink do
     }
   end
 
+  # http://erlang.org/documentation/doc-10.0/lib/kernel-6.0/doc/html/logger_chapter.html#log-level
   defp level(level) do
     case level do
-      :debug -> 20
-      :info -> 30
-      :warn -> 40
-      :error -> 50
+      :debug -> 7
+      :info -> 6
+      :warn -> 4
+      :error -> 3
     end
   end
 
