@@ -123,7 +123,7 @@ defmodule Ink do
       message
       |> base_map(timestamp, level, config)
       |> Map.merge(process_metadata(metadata, config))
-      |> Ink.Encoder.encode()
+      |> encode_map()
       |> log_json(config)
     end
   end
@@ -150,6 +150,19 @@ defmodule Ink do
     end)
   end
 
+  # Attempts to encode the log content. On error, the original log content
+  # is appended to the return, so subsequent callers can operate on both
+  # the error and the full log content.
+  defp encode_map(log) do
+    case Ink.Encoder.encode(log) do
+      {:ok, _} = result ->
+        result
+
+      {:error, _} = error ->
+        Tuple.append(error, log)
+    end
+  end
+
   defp log_json({:ok, json}, config) do
     json
     |> filter_secret_strings(config.secret_strings)
@@ -158,7 +171,7 @@ defmodule Ink do
 
   defp log_json(other, config) do
     case config.log_encoding_error do
-      true -> log_to_device(inspect(other), config.io_device)
+      true -> log_to_device(inspect(other, limit: :infinity), config.io_device)
       _ -> :ok
     end
   end
