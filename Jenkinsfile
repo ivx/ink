@@ -5,7 +5,7 @@ def version
 node {
   checkout scm
   stage('Build') {
-    app = docker.build("quay.io/invisionag/${name}", "--pull .")
+    app = docker.build("eu.gcr.io/ivx-docker-registry/${name}", "--pull .")
   }
 
   stage('Test') {
