@@ -94,6 +94,22 @@ defmodule InkTest do
     refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
   end
 
+  test "it respects status_mapping: :bunyan" do
+    Logger.configure_backend(Ink, status_mapping: :bunyan)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert msg |> Jason.decode!() |> Map.fetch!("level") == 30
+  end
+
+  test "it respects status_mapping: :rfc5424" do
+    Logger.configure_backend(Ink, status_mapping: :rfc5424)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert msg |> Jason.decode!() |> Map.fetch!("level") == 6
+  end
+
   test "it filters preconfigured secret strings" do
     Logger.info("this is moep")
 

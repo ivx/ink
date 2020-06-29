@@ -20,6 +20,7 @@ defmodule Ink do
   - `:name` the name of your app that will be added to all logs
   - `:io_device` the IO device the logs are written to (default: `:stdio`)
   - `:level` the minimum log level for outputting messages (default: `:debug`)
+  - `:status_mapping` the mapping to use for log statuses (default: `:bunyan`)
   - `:filtered_strings` secret strings that should not be printed in logs
   (default: `[]`)
   - `:filtered_uri_credentials` URIs that contain credentials for filtering
@@ -165,26 +166,26 @@ defmodule Ink do
 
   defp log_to_device(msg, io_device), do: IO.puts(io_device, msg)
 
-  defp base_map(message, timestamp, level, %{exclude_hostname: true} = _config)
+  defp base_map(message, timestamp, level, %{exclude_hostname: true} = config)
        when is_binary(message) do
     %{
       name: name(),
       pid: System.get_pid() |> String.to_integer(),
       msg: message,
       time: formatted_timestamp(timestamp),
-      level: level(level),
+      level: level(level, config.status_mapping),
       v: 0
     }
   end
 
-  defp base_map(message, timestamp, level, _) when is_binary(message) do
+  defp base_map(message, timestamp, level, config) when is_binary(message) do
     %{
       name: name(),
       pid: System.get_pid() |> String.to_integer(),
       hostname: hostname(),
       msg: message,
       time: formatted_timestamp(timestamp),
-      level: level(level),
+      level: level(level, config.status_mapping),
       v: 0
     }
   end
@@ -226,6 +227,7 @@ defmodule Ink do
   defp default_options do
     %{
       level: :debug,
+      status_mapping: :bunyan,
       filtered_strings: [],
       filtered_uri_credentials: [],
       secret_strings: [],
@@ -236,12 +238,23 @@ defmodule Ink do
     }
   end
 
-  defp level(level) do
+  # https://github.com/trentm/node-bunyan#levels
+  defp level(level, :bunyan) do
     case level do
       :debug -> 20
       :info -> 30
       :warn -> 40
       :error -> 50
+    end
+  end
+
+  # http://erlang.org/documentation/doc-10.0/lib/kernel-6.0/doc/html/logger_chapter.html#log-level
+  defp level(level, :rfc5424) do
+    case level do
+      :debug -> 7
+      :info -> 6
+      :warn -> 4
+      :error -> 3
     end
   end
 
