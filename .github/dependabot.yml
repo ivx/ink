@@ -1,0 +1,25 @@
+version: 2
+registries:
+  hex-organization-invisionag:
+    type: hex-organization
+    organization: invisionag
+    key: "${{secrets.HEX_ORGANIZATION_INVISIONAG_KEY}}"
+
+updates:
+- package-ecosystem: mix
+  directory: "/"
+  schedule:
+    interval: weekly
+  pull-request-branch-name:
+    separator: "-"
+  open-pull-requests-limit: 10
+  ignore:
+  - dependency-name: ex_doc
+    versions:
+    - 0.24.0
+    - 0.24.2
+  - dependency-name: credo
+    versions:
+    - 1.5.5
+  registries:
+  - hex-organization-invisionag
