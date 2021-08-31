@@ -120,7 +120,14 @@ defmodule Ink do
   end
 
   defp log_message(message, level, timestamp, metadata, config) do
-    if Logger.compare_levels(level, config.level) != :lt do
+    min_log_level =
+      case metadata[:ink_log_level] do
+        l when not is_nil(l) and is_atom(l) -> l
+        l when not is_nil(l) and is_binary(l) -> String.to_existing_atom(l)
+        _ -> config.level
+      end
+
+    if Logger.compare_levels(level, min_log_level) != :lt do
       message
       |> base_map(timestamp, level, config)
       |> Map.merge(process_metadata(metadata, config))
