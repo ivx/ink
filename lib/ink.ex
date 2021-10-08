@@ -27,6 +27,8 @@ defmodule Ink do
   (default: `[]`)
   - `:metadata` the metadata keys that should be included in the logs (default:
   all)
+  - `:exclude_metadata` the metadata keys that you do not want in the logs
+  (default: `[]`)
   - `:exclude_hostname` exclude local `hostname` from the log (default:
   false)
   - `:log_encoding_error` whether to log errors that happen during JSON encoding
@@ -76,6 +78,12 @@ defmodule Ink do
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
    LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
+
+  If you want to register all metadata except some specific fields. You can
+  configure `Ink` to exclude those fields in the logged JSON.
+
+      config :logger, Ink,
+        exclude_metadata: [:hostname]
   """
 
   @behaviour :gen_event
@@ -132,6 +140,7 @@ defmodule Ink do
   defp process_metadata(metadata, config) do
     metadata
     |> filter_metadata(config)
+    |> reject_metadata(config)
     |> rename_metadata_fields
     |> Enum.into(%{})
     |> Map.delete(:time)
@@ -141,6 +150,10 @@ defmodule Ink do
 
   defp filter_metadata(metadata, config) do
     metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
+  end
+
+  defp reject_metadata(metadata, config) do
+    Enum.reject(metadata, fn {key, _} -> key in config.exclude_metadata end)
   end
 
   defp rename_metadata_fields(metadata) do
@@ -233,6 +246,7 @@ defmodule Ink do
       secret_strings: [],
       io_device: :stdio,
       metadata: nil,
+      exclude_metadata: [],
       exclude_hostname: false,
       log_encoding_error: true
     }
