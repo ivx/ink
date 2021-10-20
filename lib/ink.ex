@@ -31,6 +31,8 @@ defmodule Ink do
   false)
   - `:log_encoding_error` whether to log errors that happen during JSON encoding
   (default: true)
+  - `:styles` dynamic configuration via logger metadata
+  (default: %{})
 
   ### Filtering secrets
 
@@ -76,6 +78,24 @@ defmodule Ink do
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
    LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
+
+  ### Styles
+
+  It's possible to adjust log level and other options on per-process basis via "styles".
+  First define named styles in config.exs:
+
+      config :logger, Ink,
+        level: :warn,
+        styles: %{
+          verbose: [level: :debug]
+        }
+
+  Then set `:ink_style` option in logger metadata:
+
+      Logger.metadata(ink_style: :verbose)
+
+  As a result, `Logger.debug(...)` calls for the current Elixir process will be logged
+  while for the rest of the app the log level will be `:warn`
   """
 
   @behaviour :gen_event
@@ -97,7 +117,9 @@ defmodule Ink do
   end
 
   def handle_event({level, _, {Logger, message, timestamp, metadata}}, state) do
-    log_message(message, level, timestamp, metadata, state)
+    config = apply_ink_style(state, metadata[:ink_style])
+
+    log_message(message, level, timestamp, metadata, config)
     {:ok, state}
   end
 
@@ -119,15 +141,19 @@ defmodule Ink do
     |> update_secret_strings
   end
 
-  defp log_message(message, level, timestamp, metadata, config) do
-    min_log_level =
-      case metadata[:ink_log_level] do
-        l when not is_nil(l) and is_atom(l) -> l
-        l when not is_nil(l) and is_binary(l) -> String.to_existing_atom(l)
-        _ -> config.level
-      end
+  defp apply_ink_style(state, nil), do: state
 
-    if Logger.compare_levels(level, min_log_level) != :lt do
+  defp apply_ink_style(state, style_name) do
+    {styles, config} = Map.pop(state, :styles, %{})
+
+    case styles[style_name] do
+      nil -> config
+      overriden_params -> Map.merge(config, Map.new(overriden_params))
+    end
+  end
+
+  defp log_message(message, level, timestamp, metadata, config) do
+    if Logger.compare_levels(level, config.level) != :lt do
       message
       |> base_map(timestamp, level, config)
       |> Map.merge(process_metadata(metadata, config))

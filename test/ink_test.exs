@@ -94,6 +94,21 @@ defmodule InkTest do
     refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
   end
 
+  test "it overrides log level via ink_override metadata" do
+    Logger.configure_backend(Ink,
+      level: :warn,
+      styles: %{
+        verbose: [level: :info]
+      }
+    )
+
+    Logger.info("test")
+    refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
+
+    Logger.info("test", ink_style: :verbose)
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, _}}
+  end
+
   test "it respects status_mapping: :bunyan" do
     Logger.configure_backend(Ink, status_mapping: :bunyan)
     Logger.info("test")
