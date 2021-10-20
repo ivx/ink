@@ -26,7 +26,7 @@ defmodule Ink do
   - `:filtered_uri_credentials` URIs that contain credentials for filtering
   (default: `[]`)
   - `:metadata` the metadata keys that should be included in the logs (default:
-  all)
+  all). Supports `{:exclude, [<keys>]}` notation.
   - `:exclude_hostname` exclude local `hostname` from the log (default:
   false)
   - `:log_encoding_error` whether to log errors that happen during JSON encoding
@@ -138,6 +138,10 @@ defmodule Ink do
   end
 
   defp filter_metadata(metadata, %{metadata: nil}), do: metadata
+
+  defp filter_metadata(metadata, %{metadata: {:exclude, blacklist}}) do
+    metadata |> Enum.reject(fn {key, _} -> key in blacklist end)
+  end
 
   defp filter_metadata(metadata, config) do
     metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
