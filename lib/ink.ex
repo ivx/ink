@@ -141,8 +141,6 @@ defmodule Ink do
     |> update_secret_strings
   end
 
-  defp apply_ink_style(state, nil), do: state
-
   defp apply_ink_style(state, style_name) do
     {styles, config} = Map.pop(state, :styles, %{})
 
