@@ -102,6 +102,7 @@ defmodule Ink do
     level = Keyword.get(metadata, :erl_level, :debug)
 
     log_message(message, level, timestamp, metadata, state)
+
     {:ok, state}
   end
 
