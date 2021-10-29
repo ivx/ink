@@ -73,6 +73,12 @@ defmodule Ink do
       config :logger, Ink,
         metadata: [:pid, :my_field]
 
+  Alternatively, if you only want to suppress specific metadata, but include
+  anything else in your log, you need to configure the hidden fields.
+
+      config :logger, Ink,
+        hide_metadata: [:gl, :erl_level]
+
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
    LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
