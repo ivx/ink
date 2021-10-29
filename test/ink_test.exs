@@ -7,12 +7,10 @@ defmodule InkTest do
     {:ok, _} = Logger.add_backend(Ink)
     Logger.configure_backend(Ink, io_device: self())
 
-    on_exit(
-      fn ->
-        Logger.flush()
-        Logger.remove_backend(Ink)
-      end
-    )
+    on_exit(fn ->
+      Logger.flush()
+      Logger.remove_backend(Ink)
+    end)
   end
 
   test "it can be configured" do
@@ -212,9 +210,7 @@ defmodule InkTest do
     Logger.info("test")
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert msg
-           |> Jason.decode!()
-           |> Map.get("hostname", :excluded) == :excluded
+    assert msg |> Jason.decode!() |> Map.get("hostname", :excluded) == :excluded
   end
 
   test "respects log_encoding_error: true" do
@@ -225,7 +221,7 @@ defmodule InkTest do
 
     assert msg =~
              "{:error, %Jason.EncodeError{" <>
-             "message: \"invalid byte 0xFF in <<255>>\"}}"
+               "message: \"invalid byte 0xFF in <<255>>\"}}"
   end
 
   test "respects log_encoding_error: false" do
