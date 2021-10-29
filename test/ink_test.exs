@@ -79,7 +79,7 @@ defmodule InkTest do
     assert 1 == decoded_msg["included"]
   end
 
-  test "it excludes configured excluded metadata" do
+  test "it excludes configured hidden metadata" do
     Logger.configure_backend(Ink, hide_metadata: [:excluded])
     Logger.metadata(not_excluded: 1, excluded: 1)
     Logger.info("test")
