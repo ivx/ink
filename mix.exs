@@ -2,7 +2,7 @@ defmodule Ink.Mixfile do
   use Mix.Project
 
   @source_url "https://github.com/ivx/ink"
-  @version "1.3.0"
+  @version "1.3.1-beta"
 
   def project do
     [
