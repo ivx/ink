@@ -76,6 +76,30 @@ defmodule Ink do
   *Note*: Since the term PID is also prevalent in the UNIX world, services like
    LogStash expect an integer if they encounter a field named `pid`. Therefore,
    `Ink` will log the PID as `erlang_pid`.
+
+  ### Status Mapping
+
+  `Ink` currently supports three different mapping for the log levels.
+
+  By default the `:bunyan` mapper is used. As Bunyan does not distinguish
+  between `:info` and `:notice`, as well as between `:error`, `:critical`
+  and `:alert`, `:info` and `:notice` are both handled as `:info`, and
+  `:error`, `:critical` and `:alert` are all handled as `:error`. For
+  more information on Bunyan's log levels look at
+  https://github.com/trentm/node-bunyan#levels
+
+  The second mapper is `:rfc5424`, which is returning the log levels in
+  accordance to the Syslog protocol. For more information look at the
+  documentation over on
+  http://erlang.org/documentation/doc-10.0/lib/kernel-6.0/doc/html/logger_chapter.html#log-level
+
+  Last but not least you can use the `:monolog` mapper. These log leves
+  are based on the Syslog protocol as well, but use a different value
+  as representation for the corresponding level. The biggest difference
+  is that while the Syslog protocol log level value get lower while
+  their significance raises, Monolog's log level values increase in
+  value while the significance raises. For more information see
+  https://github.com/Seldaek/monolog/blob/main/doc/01-usage.md#log-levels
   """
 
   @behaviour :gen_event
@@ -97,8 +121,8 @@ defmodule Ink do
   end
 
   def handle_event({_, _, {Logger, message, timestamp, metadata}} = xxx, state) do
-    # Not sure why or where the log level from Logger gets changed, but in order to get the origial log level
-    # I use the erlang one
+    # Not sure why or where the log level from Logger gets changed, but in order
+    # to get the origial log level I use the erlang one.
     level = Keyword.get(metadata, :erl_level, :debug)
 
     log_message(message, level, timestamp, metadata, state)

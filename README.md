@@ -19,7 +19,7 @@ Just add `:ink` to your dependencies and run `mix deps.get`.
 ```elixir
 def deps do
   [
-    {:ink, "~> 1.0"}
+    {:ink, "~> 1.3"}
   ]
 end
 ```
