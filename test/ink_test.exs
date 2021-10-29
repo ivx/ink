@@ -79,6 +79,17 @@ defmodule InkTest do
     assert 1 == decoded_msg["included"]
   end
 
+  test "it excludes configured excluded metadata" do
+    Logger.configure_backend(Ink, hide_metadata: [:excluded])
+    Logger.metadata(not_excluded: 1, excluded: 1)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    decoded_msg = Jason.decode!(msg)
+    assert 1 == decoded_msg["not_excluded"]
+    assert nil == decoded_msg["excluded"]
+  end
+
   test "it puts the erlang process pid into erlang_pid" do
     Logger.info("test")
 

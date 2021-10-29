@@ -161,6 +161,7 @@ defmodule Ink do
   defp process_metadata(metadata, config) do
     metadata
     |> filter_metadata(config)
+    |> hide_metadata(config)
     |> rename_metadata_fields
     |> Enum.into(%{})
     |> Map.delete(:time)
@@ -170,6 +171,12 @@ defmodule Ink do
 
   defp filter_metadata(metadata, config) do
     metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
+  end
+
+  defp hide_metadata(metadata, %{hide_metadata: nil}), do: metadata
+
+  defp hide_metadata(metadata, config) do
+    metadata |> Enum.filter(fn {key, _} -> key not in config.hide_metadata end)
   end
 
   defp rename_metadata_fields(metadata) do
@@ -262,6 +269,7 @@ defmodule Ink do
       secret_strings: [],
       io_device: :stdio,
       metadata: nil,
+      hide_metadata: nil,
       exclude_hostname: false,
       log_encoding_error: true
     }
