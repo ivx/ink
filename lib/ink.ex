@@ -126,10 +126,11 @@ defmodule Ink do
     {:ok, state}
   end
 
-  def handle_event({_, _, {Logger, message, timestamp, metadata}}, state) do
+  def handle_event({level, _, {Logger, message, timestamp, metadata}}, state) do
     # Not sure why or where the log level from Logger gets changed, but in order
-    # to get the original log level I use the erlang one.
-    level = Keyword.get(metadata, :erl_level, :debug)
+    # to get the original log level I use the erlang one and use the Logger one
+    # only as fallback.
+    level = Keyword.get(metadata, :erl_level, level)
 
     log_message(message, level, timestamp, metadata, state)
 
