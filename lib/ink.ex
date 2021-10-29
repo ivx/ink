@@ -271,6 +271,20 @@ defmodule Ink do
     end
   end
 
+  # https://github.com/Seldaek/monolog/blob/main/doc/01-usage.md#log-levels
+  defp level(level, :monolog) do
+    case level do
+      :debug -> 100
+      :info -> 200
+      :notice -> 250
+      :warning -> 300
+      :error -> 400
+      :critical -> 500
+      :alert -> 550
+      :emergency -> 600
+    end
+  end
+
   defp hostname do
     with {:ok, hostname} <- :inet.gethostname(), do: List.to_string(hostname)
   end

@@ -146,6 +146,31 @@ defmodule InkTest do
     end
   end
 
+  @levels [
+    debug: 100,
+    info: 200,
+    notice: 250,
+    warning: 300,
+    error: 400,
+    critical: 500,
+    alert: 550,
+    emergency: 600,
+  ]
+
+  for {fun, level} <- @levels do
+    test "it respects status_mapping: :monolog (#{fun})" do
+      Logger.configure_backend(Ink, status_mapping: :monolog)
+
+      str = unquote(to_string(fun))
+
+      Logger.unquote(fun)(str)
+
+      assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+      assert msg |> Jason.decode!() |> Map.fetch!("msg") == str
+      assert msg |> Jason.decode!() |> Map.fetch!("level") == unquote(level)
+    end
+  end
+
   test "it filters preconfigured secret strings" do
     Logger.info("this is moep")
 
