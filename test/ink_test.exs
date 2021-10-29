@@ -94,20 +94,54 @@ defmodule InkTest do
     refute_receive {:io_request, _, _, {:put_chars, :unicode, _}}
   end
 
-  test "it respects status_mapping: :bunyan" do
-    Logger.configure_backend(Ink, status_mapping: :bunyan)
-    Logger.info("test")
+  @levels [
+    debug: 20,
+    info: 30,
+    notice: 30,
+    warning: 40,
+    error: 50,
+    critical: 50,
+    alert: 50,
+    emergency: 60,
+  ]
 
-    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert msg |> Jason.decode!() |> Map.fetch!("level") == 30
+  for {fun, level} <- @levels do
+    test "it respects status_mapping: :bunyan (#{fun})" do
+      Logger.configure_backend(Ink, status_mapping: :bunyan)
+
+      str = unquote(to_string(fun))
+
+      Logger.unquote(fun)(str)
+
+      assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+      assert msg |> Jason.decode!() |> Map.fetch!("msg") == str
+      assert msg |> Jason.decode!() |> Map.fetch!("level") == unquote(level)
+    end
   end
 
-  test "it respects status_mapping: :rfc5424" do
-    Logger.configure_backend(Ink, status_mapping: :rfc5424)
-    Logger.info("test")
+  @levels [
+    debug: 7,
+    info: 6,
+    notice: 5,
+    warning: 4,
+    error: 3,
+    critical: 2,
+    alert: 1,
+    emergency: 0,
+  ]
 
-    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
-    assert msg |> Jason.decode!() |> Map.fetch!("level") == 6
+  for {fun, level} <- @levels do
+    test "it respects status_mapping: :rfc5424 (#{fun})" do
+      Logger.configure_backend(Ink, status_mapping: :rfc5424)
+
+      str = unquote(to_string(fun))
+
+      Logger.unquote(fun)(str)
+
+      assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+      assert msg |> Jason.decode!() |> Map.fetch!("msg") == str
+      assert msg |> Jason.decode!() |> Map.fetch!("level") == unquote(level)
+    end
   end
 
   test "it filters preconfigured secret strings" do

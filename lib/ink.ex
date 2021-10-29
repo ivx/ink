@@ -96,7 +96,11 @@ defmodule Ink do
     {:ok, state}
   end
 
-  def handle_event({level, _, {Logger, message, timestamp, metadata}}, state) do
+  def handle_event({_, _, {Logger, message, timestamp, metadata}} = xxx, state) do
+    # Not sure why or where the log level from Logger gets changed, but in order to get the origial log level
+    # I use the erlang one
+    level = Keyword.get(metadata, :erl_level, :debug)
+
     log_message(message, level, timestamp, metadata, state)
     {:ok, state}
   end
@@ -243,8 +247,12 @@ defmodule Ink do
     case level do
       :debug -> 20
       :info -> 30
-      :warn -> 40
+      :notice -> 30
+      :warning -> 40
       :error -> 50
+      :critical -> 50
+      :alert -> 50
+      :emergency -> 60
     end
   end
 
@@ -253,8 +261,12 @@ defmodule Ink do
     case level do
       :debug -> 7
       :info -> 6
-      :warn -> 4
+      :notice -> 5
+      :warning -> 4
       :error -> 3
+      :critical -> 2
+      :alert -> 1
+      :emergency -> 0
     end
   end
 
