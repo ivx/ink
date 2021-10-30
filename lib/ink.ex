@@ -175,6 +175,7 @@ defmodule Ink do
   end
 
   defp filter_metadata(metadata, %{metadata: nil}), do: metadata
+  defp filter_metadata(metadata, %{metadata: :all}), do: metadata
 
   defp filter_metadata(metadata, config) do
     metadata |> Enum.filter(fn {key, _} -> key in config.metadata end)
