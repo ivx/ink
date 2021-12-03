@@ -177,4 +177,30 @@ defmodule InkTest do
 
     assert_receive {:io_request, _, _, {:put_chars, :unicode, _msg}}
   end
+
+  test "used the force_inspect_fields option" do
+    Logger.configure_backend(Ink, force_inspect_fields: ~w(my encoded fields)a)
+    Logger.info("test", non_inspected: %{nested: %{data: 1}}, my: %{inspected: 1}, encoded: 1, fields: "123")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+
+    assert %{
+             "name" => "ink",
+             "hostname" => hostname,
+             "pid" => pid,
+             "msg" => "test",
+             "time" => timestamp,
+             "level" => 30,
+             "v" => 0,
+             "non_inspected" => %{"nested" => %{"data" => 1}},
+             "my" => ~s(%{inspected: 1}),
+             "encoded" => "1",
+             "fields" => ~s("123")
+           } = Jason.decode!(msg)
+
+    assert is_binary(hostname)
+    assert is_integer(pid)
+
+    assert {:ok, _} = NaiveDateTime.from_iso8601(timestamp)
+  end
 end

@@ -31,6 +31,7 @@ defmodule Ink do
   false)
   - `:log_encoding_error` whether to log errors that happen during JSON encoding
   (default: true)
+  - `:force_inspect_fields` A list of `:metadata` fields which will be `inspect`ed before encoding
 
   ### Filtering secrets
 
@@ -124,6 +125,7 @@ defmodule Ink do
       message
       |> base_map(timestamp, level, config)
       |> Map.merge(process_metadata(metadata, config))
+      |> force_inspect(config.force_inspect_fields)
       |> Ink.Encoder.encode()
       |> log_json(config)
     end
@@ -148,6 +150,16 @@ defmodule Ink do
     |> Enum.map(fn
       {:pid, value} -> {:erlang_pid, value}
       other -> other
+    end)
+  end
+
+  defp force_inspect(metadata, fields) do
+    Map.new(metadata, fn {k, v} ->
+      if k in fields do
+        {k, inspect(v)}
+      else
+        {k, v}
+      end
     end)
   end
 
@@ -234,7 +246,8 @@ defmodule Ink do
       io_device: :stdio,
       metadata: nil,
       exclude_hostname: false,
-      log_encoding_error: true
+      log_encoding_error: true,
+      force_inspect_fields: []
     }
   end
 
