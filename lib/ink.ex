@@ -170,7 +170,7 @@ defmodule Ink do
        when is_binary(message) do
     %{
       name: name(),
-      pid: System.get_pid() |> String.to_integer(),
+      pid: System.pid() |> String.to_integer(),
       msg: message,
       time: formatted_timestamp(timestamp),
       level: level(level, config.status_mapping),
@@ -181,7 +181,7 @@ defmodule Ink do
   defp base_map(message, timestamp, level, config) when is_binary(message) do
     %{
       name: name(),
-      pid: System.get_pid() |> String.to_integer(),
+      pid: System.pid() |> String.to_integer(),
       hostname: hostname(),
       msg: message,
       time: formatted_timestamp(timestamp),
