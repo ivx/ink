@@ -1,4 +1,4 @@
-FROM hexpm/elixir:1.13.2-erlang-24.2.1-alpine-3.15.0
+FROM hexpm/elixir:1.13.3-erlang-24.3.3-alpine-3.15.3
 
 RUN mix local.hex --force
 RUN mix local.rebar --force
