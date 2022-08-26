@@ -25,7 +25,7 @@ if (env.BRANCH_NAME == 'master') {
         ).trim()
       }
       node {
-        sh "github-release-wrapper release --user ivx --repo ${name} --tag v${version} --name v${version}"
+        sh "github-release-wrapper v${version}"
       }
     }
   }
