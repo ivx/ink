@@ -11,22 +11,18 @@ node {
   stage('Test') {
     app.run()
   }
-}
 
-if (env.BRANCH_NAME == 'master') {
-  timeout (time: 8, unit: 'HOURS') {
-    stage 'Deploy'
-    input 'Deploy as release?'
-    node {
+  if (env.BRANCH_NAME == 'master') {
+    timeout (time: 8, unit: 'HOURS') {
+      stage 'Deploy'
+      input 'Deploy as release?'
       app.inside("-u 0:0") {
         version = sh (
           returnStdout: true,
           script: "mix version"
         ).trim()
       }
-      node {
-        sh "github-release-wrapper v${version}"
-      }
+      sh "github-release-wrapper v${version}"
     }
   }
 }
