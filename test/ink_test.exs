@@ -102,6 +102,14 @@ defmodule InkTest do
     assert msg |> Jason.decode!() |> Map.fetch!("level") == 30
   end
 
+  test "it respects status_mapping: :string" do
+    Logger.configure_backend(Ink, status_mapping: :string)
+    Logger.info("test")
+
+    assert_receive {:io_request, _, _, {:put_chars, :unicode, msg}}
+    assert msg |> Jason.decode!() |> Map.fetch!("level") == "info"
+  end
+
   test "it respects status_mapping: :rfc5424" do
     Logger.configure_backend(Ink, status_mapping: :rfc5424)
     Logger.info("test")

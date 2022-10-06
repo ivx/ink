@@ -258,6 +258,10 @@ defmodule Ink do
     end
   end
 
+  defp level(level, :string) do
+    Atom.to_string(level)
+  end
+
   defp hostname do
     with {:ok, hostname} <- :inet.gethostname(), do: List.to_string(hostname)
   end
