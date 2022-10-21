@@ -1,3 +1,8 @@
+# Unmaintained
+
+This package is unmaintained.
+If you would like to maintain this package get in contact.
+
 # Ink
 
 [![Build Status](https://travis-ci.org/ivx/ink.svg?branch=master)](https://travis-ci.org/ivx/ink)
@@ -6,6 +11,7 @@
 [![Total Download](https://img.shields.io/hexpm/dt/ink.svg)](https://hex.pm/packages/ink)
 [![License](https://img.shields.io/hexpm/l/ink.svg)](https://github.com/ivx/ink/blob/master/LICENSE)
 [![Last Updated](https://img.shields.io/github/last-commit/ivx/ink.svg)](https://github.com/ivx/ink/commits/master)
+
 
 Ink is a backend for the Elixir `Logger` with two main purposes:
 
